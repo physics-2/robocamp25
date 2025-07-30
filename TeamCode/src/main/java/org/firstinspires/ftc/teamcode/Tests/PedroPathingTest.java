@@ -181,7 +181,7 @@ public class PedroPathingTest extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                if((!follower.isBusy())) {
+                if(!follower.isBusy()) {
                     follower.followPath(scoreFirst, true);
                     setPathState(1);
                 }
