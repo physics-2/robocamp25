@@ -29,13 +29,13 @@ public class OutTake {
     private static final double maxSpeed = 1;
     private static final double GRAB_REALESE_POS = 0.6;
     private static final double GRAB_HOLD_POS = 1;
-    private static final double ROTATION_SCORE = 0.9;
-    private static final double ROTATION_INTAKE = 0.8;
+    private static final double ROTATION_SCORE = 0.85;
+    private static final double ROTATION_INTAKE = 0.81;
     private static final int LIFT_SCORE = 210;
     private static final int LIFT_INTAKE = 30;
-    private static final double OUTTAKE_ARM_INTAKE_POS = 0.165;
-    private static final double OUTTAKE_ARM_SCORE_POS = 0.74;
-    private static final double EXTENSION_INTAKE_POS = 0.325;
+    private static final double OUTTAKE_ARM_INTAKE_POS = 0.16;
+    private static final double OUTTAKE_ARM_SCORE_POS = 0.75;
+    private static final double EXTENSION_INTAKE_POS = 0.4;
     private static final double EXTENSION_SCORE_POS = 0.785;
     public OutTake(HardwareMap hardwareMap) {
 

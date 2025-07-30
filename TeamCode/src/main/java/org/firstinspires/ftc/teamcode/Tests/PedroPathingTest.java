@@ -33,7 +33,7 @@ public class PedroPathingTest extends OpMode {
 
     private final Pose startPose = new Pose(0, 60, Math.toRadians(0));
 
-    private final Pose scorePositionFirst = new Pose(45, 72, Math.toRadians(0));
+    private final Pose scorePositionFirst = new Pose(47, 72, Math.toRadians(0));
     private final Pose scoreFirstControlPoint = new Pose(21, 72, Math.toRadians(0));
 
 
@@ -48,15 +48,15 @@ public class PedroPathingTest extends OpMode {
 
     private final Pose put2Spes = new Pose(25, 14, Math.toRadians(0));
 
-    private final Pose intakeTransition = new Pose(-0.5, 38, Math.toRadians(0));
+    private final Pose intakeTransition = new Pose(-0.3, 38, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint = new Pose(33, 42, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint2 = new Pose(29, 37, Math.toRadians(0));
 
-    private final Pose scoreLoop = new Pose(45, 72, Math.toRadians(0));
+    private final Pose scoreLoop = new Pose(47, 72, Math.toRadians(0));
     private final Pose LoopControlPoint = new Pose(55, 32, Math.toRadians(0));
     private final Pose LoopControlPoint2 = new Pose(0, 72, Math.toRadians(0));
 
-    private final Pose intakeLoop = new Pose(-0.5, 38, Math.toRadians(0));
+    private final Pose intakeLoop = new Pose(-0.3, 38, Math.toRadians(0));
 
 
 
@@ -156,7 +156,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(scoreLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.2,() -> outTake.MoveScorePos())
+                .addParametricCallback(0.6,() -> outTake.MoveScorePos())
                 .build();
 
          toIntakeLoop = follower.pathBuilder()
@@ -167,7 +167,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(intakeLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.4,() -> outTake.MoveIntakePos())
+                .addParametricCallback(0.5,() -> outTake.MoveIntakePos())
                 .build();
 
 
