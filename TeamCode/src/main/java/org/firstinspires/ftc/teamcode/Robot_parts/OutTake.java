@@ -103,7 +103,10 @@ public class OutTake {
         setOutTakeArmExtension(EXTENSION_INTAKE_POS);
         setOutTakeArmPositon(OUTTAKE_ARM_INTAKE_POS);
         setOutTakeRotation(ROTATION_INTAKE);
-        setLiftExtension(LIFT_INTAKE);
+    }
+
+    public void MoveLiftScorePos(){
+        setLiftExtension(LIFT_SCORE);
     }
 
     public void MoveScorePos(){

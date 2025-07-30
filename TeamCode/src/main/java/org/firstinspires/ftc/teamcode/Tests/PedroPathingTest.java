@@ -25,7 +25,11 @@ public class PedroPathingTest extends OpMode {
     private Follower follower;
     private OutTake outTake;
     private Intake intake;
-    private  boolean goingToScore  = true;
+    private final int CYCLE_AMOUNT = 5;
+    private final double AT_PATH_END = 0.945;
+    private final double AT_PATH_MIDDLE = 0.45;
+    private final double AT_PATH_START = 0.1;
+    private  boolean goingToScore  = true;//half period cycle,if true - moves to scoring position,if false - moves to intake position
 
     private int loopCount = 0;
     private int pathState = 0;
@@ -91,7 +95,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(scorePositionFirst)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                 .addParametricCallback(0.9,() -> outTake.releaseClaw())
+                 .addParametricCallback(AT_PATH_END,() -> outTake.releaseClaw())
                 .build();
 
 
@@ -102,7 +106,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(scoreFirstControlPoint2),
                         new Point(grab1Spes)
                 ))
-                 .addParametricCallback(0.6,() -> outTake.MoveIntakePos())
+                 .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
@@ -132,7 +136,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(put2Spes)
                 ))
                  .setConstantHeadingInterpolation(Math.toRadians(0))
-                 .addParametricCallback(0.6,() -> outTake.MoveIntakePos())
+                 .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
                 .build();
 
 
@@ -144,7 +148,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(intakeTransition)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                 .addParametricCallback(0.945,() -> outTake.grabClaw())
+                 .addParametricCallback(AT_PATH_END,() -> outTake.grabClaw())
                 .build();
 
 
@@ -156,7 +160,8 @@ public class PedroPathingTest extends OpMode {
                         new Point(scoreLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.1,() -> outTake.MoveScorePos())
+                 .addParametricCallback(AT_PATH_START,() -> outTake.MoveLiftScorePos())
+                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveScorePos())
                 .build();
 
          toIntakeLoop = follower.pathBuilder()
@@ -167,7 +172,7 @@ public class PedroPathingTest extends OpMode {
                         new Point(intakeLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.5,() -> outTake.MoveIntakePos())
+                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
                 .build();
 
 
@@ -176,8 +181,10 @@ public class PedroPathingTest extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                follower.followPath(scoreFirst, true);
-                setPathState(1);
+                if((!follower.isBusy())) {
+                    follower.followPath(scoreFirst, true);
+                    setPathState(1);
+                }
                 break;
             case 1:
                 if (!follower.isBusy()) {
@@ -206,30 +213,28 @@ public class PedroPathingTest extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.7);
+                    follower.setMaxPower(0.7);//to increase accuracy
                     follower.followPath(intakeTransit, true);
                     setPathState(6);
                 }
                 break;
             case 6:
                 if (!follower.isBusy()) {
-
-
-                if (loopCount < 5) {
-                        if (goingToScore) {
-                            outTake.grabClaw();
-                            follower.followPath(toScoreLoop, true);
-                            goingToScore = false;
+                    if (loopCount < CYCLE_AMOUNT) {
+                            if (goingToScore) {
+                                outTake.grabClaw();
+                                follower.followPath(toScoreLoop, true);
+                                goingToScore = false;
+                            } else {
+                                outTake.releaseClaw();
+                                follower.followPath(toIntakeLoop, true);
+                                goingToScore = true;
+                                loopCount++;
+                            }
                         } else {
-                            outTake.releaseClaw();
-                            follower.followPath(toIntakeLoop, true);
-                            goingToScore = true;
-                            loopCount++;
+                            setPathState(7);
                         }
-                    } else {
-                        setPathState(7);
                     }
-                }
                 break;
             case 7:
 
