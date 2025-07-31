@@ -34,7 +34,5 @@ public class KinematicTest extends LinearOpMode {
            }
            outTake.updateLiftPID();
        }
-
-
     }
 }
