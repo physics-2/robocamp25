@@ -18,9 +18,9 @@ public class OutTake {
     private final DcMotorEx liftLeftExtensionMotor;
     private final DcMotorEx liftRightExtensionMotor;
 
-    private final PIDCoefficients liftCoef = new PIDCoefficients(0.01,0,0.00003);
+    private final PIDCoefficients liftCoef = new PIDCoefficients(0.01,0.00001,0.00003);
     private double integralLift = 0;
-    private final double iMaxLift = 0 ;
+    private final double iMaxLift = 0.3 ;
     private double errorOldLift = 0;
     private int liftTarget = 0;
 
@@ -100,6 +100,7 @@ public class OutTake {
     }
 
     public void MoveIntakePos(){
+        setLiftExtension(LIFT_INTAKE);
         setOutTakeArmExtension(EXTENSION_INTAKE_POS);
         setOutTakeArmPositon(OUTTAKE_ARM_INTAKE_POS);
         setOutTakeRotation(ROTATION_INTAKE);

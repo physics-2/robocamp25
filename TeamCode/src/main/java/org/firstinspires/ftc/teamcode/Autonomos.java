@@ -52,7 +52,7 @@ public class Autonomos extends OpMode {
 
     private final Pose put2Spes = new Pose(25, 14, Math.toRadians(0));
 
-    private final Pose intakeTransition = new Pose(-0, 38, Math.toRadians(0));
+    private final Pose intakeTransition = new Pose(-0.1, 38, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint = new Pose(33, 42, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint2 = new Pose(29, 37, Math.toRadians(0));
 
@@ -60,7 +60,7 @@ public class Autonomos extends OpMode {
     private final Pose LoopControlPoint = new Pose(55, 32, Math.toRadians(0));
     private final Pose LoopControlPoint2 = new Pose(0, 72, Math.toRadians(0));
 
-    private final Pose intakeLoop = new Pose(0, 38, Math.toRadians(0));
+    private final Pose intakeLoop = new Pose(-0.1, 38, Math.toRadians(0));
 
 
 
@@ -81,6 +81,7 @@ public class Autonomos extends OpMode {
         loopCount = 0;
         outTake.grabClaw();
         outTake.MoveScorePos();
+        outTake.MoveLiftScorePos();
         intake.setLinkageExtension(0);
 
     }
@@ -95,6 +96,7 @@ public class Autonomos extends OpMode {
                         new Point(scorePositionFirst)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
+                .addTemporalCallback(200,() -> outTake.MoveLiftScorePos())
                 .addParametricCallback(AT_PATH_END,() -> outTake.releaseClaw())
                 .build();
 
@@ -160,8 +162,7 @@ public class Autonomos extends OpMode {
                         new Point(scoreLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(AT_PATH_START,() -> outTake.MoveLiftScorePos())
-                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveScorePos())
+                .addTemporalCallback(100  ,() -> outTake.MoveScorePos())
                 .build();
 
         toIntakeLoop = follower.pathBuilder()
@@ -172,7 +173,7 @@ public class Autonomos extends OpMode {
                         new Point(intakeLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
+                .addTemporalCallback(200,() -> outTake.MoveIntakePos())
                 .build();
 
 
@@ -224,12 +225,16 @@ public class Autonomos extends OpMode {
                         if (goingToScore) {
                             outTake.grabClaw();
                             follower.followPath(toScoreLoop, true);
-                            goingToScore = false;
-                        } else {
+                            if(pathTimer.getElapsedTime() > 200)goingToScore = false;
+                        }
+                        else
+                        {
                             outTake.releaseClaw();
                             follower.followPath(toIntakeLoop, true);
-                            goingToScore = true;
-                            loopCount++;
+                           if(pathTimer.getElapsedTime() > 200){
+                               goingToScore = true;
+                               loopCount++;
+                           }
                         }
                     } else {
                         setPathState(7);

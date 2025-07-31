@@ -29,9 +29,9 @@ public class Intake {
 
     private final PIDCoefficients linkageCoef = new PIDCoefficients(0.03, 0, 0.00005);
     private double linkageI = 0;
-    private final double iMaxLinkage = 0;
+    private final double iMaxLinkage = 0.3;
     private double errorOldLinkage = 0;
-    private int linkageTarget = 0;
+    private int linkageTarget ;
 
 
     private static final double maxSpeed = 0.8;
