@@ -18,7 +18,7 @@ public class OutTake {
     private final DcMotorEx liftLeftExtensionMotor;
     private final DcMotorEx liftRightExtensionMotor;
 
-    private final PIDCoefficients liftCoef = new PIDCoefficients(0.01,0.00001,0.00003);
+    private final PIDCoefficients liftCoef = new PIDCoefficients(0.005,0.00001,0.00002);
     private double integralLift = 0;
     private final double iMaxLift = 0.3 ;
     private double errorOldLift = 0;
@@ -31,12 +31,12 @@ public class OutTake {
     private static final double GRAB_HOLD_POS = 1;
     private static final double ROTATION_SCORE = 0.92;
     private static final double ROTATION_INTAKE = 0.81;
-    private static final int LIFT_SCORE = 210;
+    private static final int LIFT_SCORE = 230;
     private static final int LIFT_INTAKE = 30;
     private static final double OUTTAKE_ARM_INTAKE_POS = 0.16;
-    private static final double OUTTAKE_ARM_SCORE_POS = 0.735;
+    private static final double OUTTAKE_ARM_SCORE_POS = 0.74;
     private static final double EXTENSION_INTAKE_POS = 0.325;
-    private static final double EXTENSION_SCORE_POS = 0.6;
+    private static final double EXTENSION_SCORE_POS = 0.65;
     public OutTake(HardwareMap hardwareMap) {
 
         leftOutTakeServo = hardwareMap.get(Servo.class, "left_scor_perkid");

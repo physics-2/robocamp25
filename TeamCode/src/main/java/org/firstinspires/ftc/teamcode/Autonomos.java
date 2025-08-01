@@ -27,13 +27,14 @@ public class Autonomos extends OpMode {
     private Intake intake;
     private final int CYCLE_AMOUNT = 5;
     private final double AT_PATH_END = 0.945;
-    private final double AT_PATH_MIDDLE = 0.45;
+    private final double AT_PATH_MIDDLE = 0.35;
     private final double AT_PATH_START = 0.1;
     private  boolean goingToScore  = true;//half period cycle,if true - moves to scoring position,if false - moves to intake position
 
     private int loopCount = 0;
     private int pathState = 0;
     private Timer pathTimer;
+    private Timer waitTimer;
 
     private final Pose startPose = new Pose(0, 60, Math.toRadians(0));
 
@@ -52,15 +53,15 @@ public class Autonomos extends OpMode {
 
     private final Pose put2Spes = new Pose(25, 14, Math.toRadians(0));
 
-    private final Pose intakeTransition = new Pose(-0.1, 38, Math.toRadians(0));
+    private final Pose intakeTransition = new Pose(0.3, 38, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint = new Pose(33, 42, Math.toRadians(0));
     private final Pose intakeTransitionControlPoint2 = new Pose(29, 37, Math.toRadians(0));
 
-    private final Pose scoreLoop = new Pose(46, 72, Math.toRadians(0));
+    private final Pose scoreLoop = new Pose(48, 72, Math.toRadians(0));
     private final Pose LoopControlPoint = new Pose(55, 32, Math.toRadians(0));
     private final Pose LoopControlPoint2 = new Pose(0, 72, Math.toRadians(0));
 
-    private final Pose intakeLoop = new Pose(-0.1, 38, Math.toRadians(0));
+    private final Pose intakeLoop = new Pose(0.3, 38, Math.toRadians(0));
 
 
 
@@ -68,6 +69,7 @@ public class Autonomos extends OpMode {
     @Override
     public void init() {
         pathTimer = new Timer();
+        waitTimer = new Timer();
         Constants.setConstants(FConstants.class, LConstants.class);
 
         outTake = new OutTake(hardwareMap);
@@ -96,7 +98,6 @@ public class Autonomos extends OpMode {
                         new Point(scorePositionFirst)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addTemporalCallback(200,() -> outTake.MoveLiftScorePos())
                 .addParametricCallback(AT_PATH_END,() -> outTake.releaseClaw())
                 .build();
 
@@ -138,7 +139,6 @@ public class Autonomos extends OpMode {
                         new Point(put2Spes)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
                 .build();
 
 
@@ -162,7 +162,7 @@ public class Autonomos extends OpMode {
                         new Point(scoreLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addTemporalCallback(100  ,() -> outTake.MoveScorePos())
+                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveScorePos())
                 .build();
 
         toIntakeLoop = follower.pathBuilder()
@@ -173,7 +173,7 @@ public class Autonomos extends OpMode {
                         new Point(intakeLoop)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addTemporalCallback(200,() -> outTake.MoveIntakePos())
+                .addParametricCallback(AT_PATH_MIDDLE,() -> outTake.MoveIntakePos())
                 .build();
 
 
@@ -182,8 +182,9 @@ public class Autonomos extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
+                outTake.MoveLiftScorePos();
                 if(!follower.isBusy()) {
-                    follower.followPath(scoreFirst, true);
+                    follower.followPath(scoreFirst, false);
                     setPathState(1);
                 }
                 break;
@@ -214,35 +215,31 @@ public class Autonomos extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.7);//to increase accuracy
+                    follower.setMaxPower(0.9);//to increase accuracy
                     follower.followPath(intakeTransit, true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy()) {
-                    if (loopCount < CYCLE_AMOUNT) {
+                if (loopCount >= CYCLE_AMOUNT) {
+                    setPathState(8);
+                } else {
+                    if (!follower.isBusy()) {
                         if (goingToScore) {
                             outTake.grabClaw();
+                            outTake.MoveLiftScorePos();
                             follower.followPath(toScoreLoop, true);
-                            if(pathTimer.getElapsedTime() > 200)goingToScore = false;
-                        }
-                        else
-                        {
+                            goingToScore = false;
+                        } else {
                             outTake.releaseClaw();
                             follower.followPath(toIntakeLoop, true);
-                           if(pathTimer.getElapsedTime() > 200){
-                               goingToScore = true;
-                               loopCount++;
-                           }
+                            goingToScore = true;
+                            loopCount++;
                         }
-                    } else {
-                        setPathState(7);
                     }
                 }
                 break;
-            case 7:
-
+            case 8:
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
